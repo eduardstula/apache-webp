@@ -1,0 +1,36 @@
+# originally from https://groups.google.com/a/webmproject.org/group/webp-discuss/browse_thread/thread/196ac4ea705688d8
+# codi snippet from: https://gist.github.com/seeekr/2415528
+
+<IfModule mod_rewrite.c>
+
+  # TODO: don't forget to put
+  # AddType image/webp .webp
+  # in your mods-available/mime.conf
+  # (though this is optional because we're setting
+  # the mime type manually in the RewriteRule)
+
+  # Enable rewrite 
+  RewriteEngine On 
+
+  # Does browser support WebP? 
+  RewriteCond %{HTTP_ACCEPT} \bimage/webp\b 
+
+  # Capture image name
+  RewriteCond %{REQUEST_URI}  (.*)\.(jpe?g|png)$
+
+  # if you don't have all jpg/png images available
+  # as webp then you want to uncomment the next line
+  # so apache first checks if there is a webp file
+  # otherwise leave it disabled as it removes the
+  # need to query the disk
+  #RewriteCond %{DOCUMENT_ROOT}%1.webp -f
+
+  # Route to WebP image 
+  RewriteRule .* %1\.webp [L,T=image/webp]
+  
+  <IfModule mod_headers.c>
+    <FilesMatch "\.(jpe?g|png)$">
+      Header append Vary Accept
+    </FilesMatch>
+  </IfModule>
+</IfModule>
